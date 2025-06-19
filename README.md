@@ -1,203 +1,87 @@
-# Gmail MCP Server
+# 📧 Gmail MCP Server
 
-A Model Context Protocol (MCP) server that provides Gmail integration capabilities through a clean, async API.
+The Gmail MCP Server provides a toolset to interact programmatically with Gmail using OAuth 2.0 authentication. It enables you to search, read, send, and manage emails efficiently using a standardized interface.
 
-## Features
+---
 
-- 🔍 **Search emails** with Gmail's powerful search syntax
-- 📧 **Send emails** with support for CC/BCC
-- 📋 **Get recent emails** from inbox
-- 📄 **Get detailed email content** including full body
-- 🏷️ **List Gmail labels** (system and custom)
-- 📁 **Get emails by label** (INBOX, STARRED, etc.)
-- 💚 **Health check** to verify server and API connectivity
-- ⏱️ **Timeout protection** for all API calls
-- 🔄 **Token refresh** capability (requires client credentials)
+## 📘 Google Cloud Setup
 
-## Quick Start
+Before using the Gmail MCP Server, you must set up a Google Cloud project, enable the Gmail API, and create OAuth 2.0 credentials.
 
-### 1. Install Dependencies
+### 1. Create a Google Cloud Project
+- Go to the [Google Cloud Console](https://console.cloud.google.com/).
+- Click the project dropdown at the top and select **New Project**.
+- Enter a project name (e.g., `Gmail MCP Server`) and click **Create**.
 
-```bash
-pip install fastmcp requests pydantic
-```
+### 2. Enable the Gmail API
+- With your project selected, navigate to the [Gmail API page](https://console.cloud.google.com/apis/library/gmail.googleapis.com).
+- Click **Enable**.
 
-### 2. Set up Gmail API Credentials
+### 3. Create OAuth 2.0 Credentials (Desktop Client)
+- In the Cloud Console, go to **APIs & Services > Credentials**.
+- Click **+ Create Credentials** and choose **OAuth client ID**.
+- If prompted, configure the consent screen:
+  - Set the **App type** to `External`.
+  - Fill in the required fields (App name, user support email, etc.).
+- For **Application type**, select **Desktop app**.
+- Enter a name (e.g., `Gmail MCP Desktop Client`) and click **Create**.
+- Download the credentials file (`credentials.json`) and store it securely. You’ll need this file for authentication.
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select existing one
-3. Enable the Gmail API
-4. Create OAuth 2.0 credentials
-5. Download the credentials file
+---
 
-### 3. Get Access and Refresh Tokens
+## 🛠️ Available Tools
 
-You'll need to obtain OAuth 2.0 tokens for Gmail API access. You can use the Google OAuth 2.0 playground or create a simple script to get these tokens.
+The Gmail MCP Server offers the following tools for interacting with Gmail:
 
-### 4. Run the Server
+- **search_emails**  
+  Search emails using Gmail’s advanced search syntax (e.g., by sender, subject, date).
 
-```bash
-python trial1.py --access-token YOUR_ACCESS_TOKEN --refresh-token YOUR_REFRESH_TOKEN
-```
+- **get_recent_emails**  
+  Retrieve the most recent emails from your Gmail inbox.
 
-### 5. Test the Server
+- **get_email_details**  
+  Fetch full details (headers, body, metadata) of a specific email using its message ID.
 
-```bash
-python test_server.py
-```
+- **send_email**  
+  Send a new email using your authenticated Gmail account.
 
-## Available Tools
+- **list_gmail_labels**  
+  List all available labels configured in your Gmail account (e.g., INBOX, STARRED, SENT).
 
-### `search_emails`
-Search Gmail using Gmail's search syntax.
+- **get_emails_by_label**  
+  Retrieve emails that belong to a specific Gmail label.
 
-**Input:**
+- **health_check**  
+  Check the health and connectivity of the Gmail MCP Server to ensure it is functioning correctly.
+  
+## 🖥️ Claude Desktop Configuration
+
+To use the **Gmail MCP Server** with Claude Desktop, update your Claude configuration file to include the following entry under `mcpServers`. Replace `CREDENTIALS_FILE` with the **absolute path** to your downloaded `credentials.json` file from the Google Cloud Console.
+
 ```json
 {
-  "params": {
-    "query": "from:example@gmail.com",
-    "max_results": 10,
-    "include_body": false
+  "mcpServers": {
+    "gmail_mcp": {
+      "command": "uvx",
+      "args": [
+        "gmail-mcp-server-ansh",
+        "--credentials-file", "CREDENTIALS_FILE"
+      ]
+    }
   }
 }
 ```
 
-**Examples:**
-- `after:2025/06/17` - Emails after specific date
-- `from:example@gmail.com` - Emails from specific sender
-- `subject:meeting` - Emails with specific subject
-- `is:unread` - Unread emails
-- `has:attachment` - Emails with attachments
+## 🔧 Programmatic Usage
 
-### `get_recent_emails`
-Get the most recent emails from inbox.
+If you are integrating the **Gmail MCP Server** into your own application (such as a custom agent system), you can configure and launch it programmatically using a `params` dictionary as shown below. Also replace `CREDENTIALS_FILE` with the **absolute path** to your downloaded `credentials.json` file from the Google Cloud Console.
 
-**Input:**
-```json
-{
-  "max_results": 10
+
+```python
+params = {
+    "command": "uvx",
+    "args": [
+        "gmail-mcp-server-ansh",
+        "--credentials-file", "CREDENTIALS_FILE"
+    ]
 }
-```
-
-### `get_email_details`
-Get complete details of a specific email including full body content.
-
-**Input:**
-```json
-{
-  "params": {
-    "message_id": "18c1234567890abcdef"
-  }
-}
-```
-
-### `send_email`
-Send an email via Gmail.
-
-**Input:**
-```json
-{
-  "params": {
-    "to": "recipient@email.com",
-    "subject": "Email Subject",
-    "body": "Email content",
-    "cc": "cc@email.com",
-    "bcc": "bcc@email.com"
-  }
-}
-```
-
-### `list_gmail_labels`
-List all Gmail labels including system and user-created labels.
-
-**Input:**
-```json
-{}
-```
-
-### `get_emails_by_label`
-Fetch emails that belong to a specific Gmail label.
-
-**Input:**
-```json
-{
-  "label_id": "INBOX",
-  "max_results": 10
-}
-```
-
-### `health_check`
-Check the health and connectivity of the Gmail MCP server.
-
-**Input:**
-```json
-{}
-```
-
-## Configuration
-
-### Environment Variables
-
-You can set these environment variables instead of passing tokens as arguments:
-
-- `GMAIL_ACCESS_TOKEN` - Your Gmail API access token
-- `GMAIL_REFRESH_TOKEN` - Your Gmail API refresh token
-
-### Server Settings
-
-The server is configured with:
-- Port: 8010
-- Log level: INFO
-- Cache expiration: 60 seconds
-- Gmail API timeout: 30 seconds
-
-## Error Handling
-
-The server includes comprehensive error handling:
-- Timeout protection for all API calls
-- Graceful handling of expired tokens
-- Detailed error messages for debugging
-- Fallback responses for failed operations
-
-## Security Considerations
-
-- Never commit tokens to version control
-- Use environment variables for sensitive data
-- Consider implementing token refresh for long-running sessions
-- Validate all input parameters
-
-## Troubleshooting
-
-### Common Issues
-
-1. **"Invalid credentials" error**
-   - Check that your access token is valid and not expired
-   - Verify your refresh token is correct
-
-2. **"Permission denied" error**
-   - Ensure your Gmail API credentials have the necessary scopes
-   - Check that the Gmail API is enabled in your Google Cloud project
-
-3. **"Timeout" errors**
-   - The server has a 30-second timeout for Gmail API calls
-   - For large email searches, try reducing `max_results`
-
-### Testing
-
-Run the test script to verify your setup:
-
-```bash
-python test_server.py
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details. 
