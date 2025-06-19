@@ -3,8 +3,8 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "gmail-mcp-server"
-version = "1.0.0"
+name = "gmail-mcp-server-ansh"
+version = "1.0.1"
 description = "A Model Context Protocol (MCP) server for Gmail integration."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -27,7 +27,7 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Ansh-Wappnet/GMAIL_MCP"
+Homepage = "https://github.com/Ansh-Wappnet/gmail_mcp_server"
 
 [project.scripts]
-gmail-mcp-server = "gmail_mcp_server.server:main" 
+gmail-mcp-server-ansh = "gmail_mcp_server.server:main" 

@@ -14,6 +14,7 @@ from gmail_mcp_server.tools import (
     get_emails_by_label,
     set_tokens
 )
+from gmail_mcp_server.oauth import get_gmail_tokens
 
 
 class GmailMCPServer:
@@ -146,9 +147,8 @@ def main():
     """Main entry point for the Gmail MCP Server"""
     # Set up argument parser
     parser = argparse.ArgumentParser(description='Enhanced Gmail MCP Server')
-    parser.add_argument('--access-token', required=True, help='Gmail API access token')
-    parser.add_argument('--refresh-token', required=True, help='Gmail API refresh token')
-    parser.add_argument('--config-file', help='Path to configuration file')
+    parser.add_argument('--credentials-file', required=True, help='Path to Google credentials.json')
+    # parser.add_argument('--config-file', help='Path to configuration file')
     
     # Parse arguments
     args = parser.parse_args()
@@ -156,9 +156,12 @@ def main():
     # Load configuration
     config = Config()
     
+    # Run OAuth flow to get tokens
+    access_token, refresh_token = get_gmail_tokens(args.credentials_file)
+    
     # Create and run server
     server = GmailMCPServer(config)
-    server.run(args.access_token, args.refresh_token)
+    server.run(access_token, refresh_token)
 
 
 if __name__ == "__main__":
